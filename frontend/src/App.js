@@ -1,4 +1,5 @@
 
+import { useCookies } from "react-cookie";
 import {
   BrowserRouter,
   Routes,
@@ -7,13 +8,16 @@ import {
 import DashBoard from "./pages/DashBoard";
 import Home from './pages/Home';
 import OnBoarding from './pages/OnBoarding'
+
 function App() {
+  const [cookies,setCookie,removeCookie]=useCookies(['user']);
+  const authToken=cookies.AuthToken;
   return (
     <BrowserRouter>
       <Routes>
           <Route path='/' element={<Home/>}/>
-          <Route path='/dashboard' element={<DashBoard/>}/>
-          <Route path="/onboarding" element={<OnBoarding/>}/>
+          {authToken && <Route path='/dashboard' element={<DashBoard/>}/>}
+          {authToken && <Route path="/onboarding" element={<OnBoarding/>}/>}
         </Routes>
     </BrowserRouter>
   );
