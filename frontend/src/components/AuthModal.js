@@ -3,6 +3,7 @@ import {useCookies} from 'react-cookie';
 import axios from 'axios';
 import {useNavigate} from 'react-router-dom';
 function AuthModal({ setShowModal,isSignUp }) {
+  // eslint-disable-next-line
   const [cookies,setCookie,removeCookie]=useCookies(['user']);
   const navigate=useNavigate();
   const [email, setEmail] = useState("");
@@ -12,6 +13,7 @@ function AuthModal({ setShowModal,isSignUp }) {
   const handleClick = () => {
     setShowModal(false);
   }
+  // console.log(isSignUp);
   const handleSubmit =async (e) => {
     e.preventDefault();
     try {
@@ -24,7 +26,7 @@ function AuthModal({ setShowModal,isSignUp }) {
       setCookie('UserId',res.data.userId);
       const success=res.status===201;
       if(success && isSignUp) navigate('/onboarding');
-      if(success) navigate('/dashboard');
+      else if(success) navigate('/dashboard');
       window.location.reload();
       
     } catch (e) {
@@ -32,7 +34,6 @@ function AuthModal({ setShowModal,isSignUp }) {
     }
 
   }
-  console.log(email, password, confirmPassword)
   return (
     <div className='auth-modal'>
       <div className='close-icon' onClick={handleClick} style={{cursor:'pointer'}}>

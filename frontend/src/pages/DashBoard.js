@@ -1,64 +1,87 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import TinderCard from 'react-tinder-card';
 import ChatContainer from '../components/ChatContainer'
 import { useCookies } from 'react-cookie';
-const db = [
-  {
-    name: 'Richard Hendricks',
-    url: 'https://i.imgur.com/PhjFIbc.jpeg'
-  },
-  {
-    name: 'Erlich Bachman',
-    url: 'https://i.imgur.com/PhjFIbc.jpeg'
-  },
-  {
-    name: 'Monica Hall',
-    url: 'https://i.imgur.com/PhjFIbc.jpeg'
-  },
-  {
-    name: 'Jared Dunn',
-    url: 'https://i.imgur.com/PhjFIbc.jpeg'
-  },
-  {
-    name: 'Dinesh Chugtai',
-    url: 'https://i.imgur.com/PhjFIbc.jpeg'
-  }
-]
-export default function DashBoard() {
 
+export default function DashBoard() {
   const [user, setUser] = useState(null);
+  const [genderedUsers, setGenderedUsers] = useState(null);
   const [cookies, setCookie, removeCookie] = useCookies(['user']);
   const userId = cookies.UserId
-  // console.log(userId);
-  const getUser = async () => {
-    console.log('here');
-    try {
-      const res = await axios.get('http://localhost:8000/user', {
-        params: { userId }
+
+
+
+  const updateMatches=async(matchedUserId)=>{
+    try{
+      await axios.put('http://localhost:8000/addmatch',{
+        userId,
+        matchedUserId
       })
-      console.log(res);
-      setUser(res.data);
-    } catch (e) {
+      const getUser = async () => {
+        // console.log('here');
+        try {
+          const res = await axios.get('http://localhost:8000/user', {
+            params: { userId }
+          })
+          setUser(res.data);
+        } catch (e) {
+          console.log(e);
+        }
+      }
+      getUser();
+    }catch(e){
       console.log(e);
     }
   }
-
-  const characters = db
   const [lastDirection, setLastDirection] = useState()
 
-  const swiped = (direction, nameToDelete) => {
-    console.log('removing: ' + nameToDelete)
+  const swiped = (direction, swipedUserId) => {
+    if(direction==='right'){
+      updateMatches(swipedUserId);
+    }
     setLastDirection(direction)
   }
 
   const outOfFrame = (name) => {
-    console.log(name + ' left the screen!')
   }
-  // getUser();
+
   useEffect(() => {
+    const getUser = async () => {
+      try {
+        const res = await axios.get('http://localhost:8000/user', {
+          params: { userId }
+        })
+        setUser(res.data);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+
     getUser();
-  },[])
+    
+
+  }, [userId])
+  useEffect(() => {
+    const getGenderedUsers = async () => {
+      try {
+        const res = await axios.get('http://localhost:8000/gendered-users', {
+          params: { gender: user?.gender_interest }
+        });
+        // console.log(res);
+        setGenderedUsers(res.data);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+    getGenderedUsers();
+
+
+  }, [user])
+  const matchedUserIds=user?.matches.map(({user_id})=>user_id).concat(userId);
+  const filteredGenderUsers=genderedUsers?.filter(
+    genderedUser=>!matchedUserIds.includes(genderedUser.user_id)
+  )
   // console.log(user);
   return (
     <>
@@ -66,10 +89,10 @@ export default function DashBoard() {
         <ChatContainer user={user} />
         <div className='swipe-container'>
           <div className='card-container'>
-            {characters.map((character) =>
-              <TinderCard className='swipe' key={character.name} onSwipe={(dir) => swiped(dir, character.name)} onCardLeftScreen={() => outOfFrame(character.name)}>
+          {filteredGenderUsers?.map((character) =>
+              <TinderCard className='swipe' key={character.user_id} onSwipe={(dir) => swiped(dir, character.user_id)} onCardLeftScreen={() => outOfFrame(character.first_name)}>
                 <div style={{ backgroundImage: 'url(' + character.url + ')' }} className='card'>
-                  <h3>{character.name}</h3>
+                  <h3>{character.first_name}</h3>
                 </div>
               </TinderCard>
             )}

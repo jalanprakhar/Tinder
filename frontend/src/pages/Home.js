@@ -1,15 +1,18 @@
 import React, { useState } from 'react'
 import Nav from '../components/Nav';
 import AuthModal from '../components/AuthModal';
+import { useCookies } from 'react-cookie';
 
 function Home() {
+    // eslint-disable-next-line
+    const [cookies,setCookie,removeCookie]=useCookies(['user']);
     const[isSignUp,setIsSignUp]=useState(true);
     const [showModal,setShowModal]=useState(false);
-    const authToken = false;
+    const authToken=cookies.AuthToken;
     const handleClick = () => {
         // console.log("clicked");
         setShowModal(true);
-        setIsSignUp(true)
+        setIsSignUp(true);
     }
     return (
         <div className='overlay'>

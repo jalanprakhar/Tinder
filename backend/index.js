@@ -5,9 +5,10 @@ const {v4:uuidv4}=require('uuid');
 const bcrypt=require('bcrypt');
 const PORT=process.env.PORT || 8000
 const User=require('./models/users.js');
+const Message=require('./models/messages.js');
 const cors=require('cors');
 const jwt=require('jsonwebtoken');
-const users = require('./models/users.js');
+const { query } = require('express');
 app.use(cors());
 app.use(express.json());
 
@@ -82,6 +83,25 @@ app.get('/users',async (req,res)=>{
         res.status(404).json({message:e.message});
     }
 })
+app.get('/matched-users',async(req,res)=>{
+    const userIds=JSON.parse(req.query.userIds);
+    try{
+        const pipeline=
+        [
+            {
+                '$match':{
+                    'user_id':{
+                        '$in':userIds
+                    }
+                }
+            }
+        ]
+        const foundUsers=await User.aggregate(pipeline)
+        res.send(foundUsers);
+    }catch(e){
+        console.log(e);
+    }
+})
 app.get('/user',async (req,res)=>{
     const userId=req.query.userId;
     try{
@@ -113,6 +133,7 @@ app.put('/user',async(req,res)=>{
         }
 
         const insertedUser=await User.updateOne(query,updateDocument);
+        // console.log(insertedUser);
         res.status(200).send(insertedUser);
 
     }catch(e){
@@ -120,6 +141,66 @@ app.put('/user',async(req,res)=>{
     }
 })
 
+
+app.get('/gendered-users',async(req,res)=>{
+    try{
+        const gender=req.query.gender;
+        const query={gender_identity:{$eq:gender}};
+        const foundUsers=await User.find(query);
+        res.json(foundUsers);
+
+    }catch(e){
+        console.log(e);
+    }
+})
+
+
+app.put('/addmatch',async(req,res)=>{
+    const{userId,matchedUserId}=req.body
+    try{
+        const query={user_id:userId};
+        const updateDocument={
+            $push:{matches:{user_id:matchedUserId}},
+        }
+        const updatedUser=await User.updateOne(query,updateDocument);
+        res.send(updatedUser);
+    }catch(e){
+        console.log(e);
+    }
+})
+
+
+
+
+
+app.get('/messages',async(req,res)=>{
+    const {userId,correspondingUserId}=req.query
+   
+    try{
+        const query={
+            from_userId:userId,
+            to_userId:correspondingUserId
+        }
+        const foundMessages=await Message.find(query);
+        // console.log(foundMessages);
+        res.send(foundMessages);
+        
+    }catch(e){
+        console.log(e);
+    }
+})
+
+
+app.post('/message',async(req,res)=>{
+    const {message}=req.body;
+    // console.log(message);
+    try{
+        const insertedMessage=await Message.create(message)
+        res.send(insertedMessage)
+    }catch(e){
+        console.log(e);
+    }
+})
 
 app.listen(PORT,()=>{
     console.log(`server running on port ${PORT}`);

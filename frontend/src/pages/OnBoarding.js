@@ -6,7 +6,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 function OnBoarding() {
-
+  // eslint-disable-next-line
   const [cookies,setCookie,removeCookie]=useCookies();
   const navigate=useNavigate();
   const [formData, setFormData] = useState({
@@ -25,10 +25,10 @@ function OnBoarding() {
   })
   const handleSubmit = async(e) => {
     e.preventDefault();
-    console.log(formData)
+    // console.log(formData)
     try{
       const res=await axios.put('http://localhost:8000/user',{formData})
-      console.log(res);
+      // console.log(res);
       const success=res.status===200
       if(success){
         navigate('/dashboard');
