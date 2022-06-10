@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import Nav from '../components/Nav'
-
+import FileBase from 'react-file-base64';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api';
@@ -191,13 +191,7 @@ function OnBoarding() {
           <section>
 
             <label htmlFor="url">Profile Photo</label>
-            <input
-              type="url"
-              name="url"
-              id="url"
-              onChange={handleChange}
-              required={true}
-            />
+            <FileBase type="file" multiple={false} onDone={({ base64 }) => setFormData({ ...formData, url: base64 })} />
             <div className="photo-container">
               {formData.url && <img src={formData.url} alt="profile pic preview" />}
             </div>

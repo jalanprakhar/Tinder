@@ -15,6 +15,7 @@ const authController = {
             if (correctPassword) {
                 const token = jwt.sign({ user: existingUser, email: sanitizedEmail }, 'mykey', { expiresIn: 60 * 24 })
                 res.status(201).json({ token, userId: existingUser.user_id })
+                return;
             }
             res.status(400).send('Invalid Credentials');
 
