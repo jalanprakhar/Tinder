@@ -1,16 +1,16 @@
 import React, { useState } from 'react'
 import Nav from '../components/Nav'
 
-import {useCookies} from 'react-cookie';
-import axios from 'axios';
+import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
+import { api } from '../api';
 
 function OnBoarding() {
   // eslint-disable-next-line
-  const [cookies,setCookie,removeCookie]=useCookies();
-  const navigate=useNavigate();
+  const [cookies, setCookie, removeCookie] = useCookies();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    user_id:cookies.UserId,
+    user_id: cookies.UserId,
     first_name: "",
     dob_day: "",
     dob_month: "",
@@ -23,22 +23,20 @@ function OnBoarding() {
     matches: []
 
   })
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // console.log(formData)
-    try{
-      const res=await axios.put('http://localhost:8000/user',{formData})
-      // console.log(res);
-      const success=res.status===200
-      if(success){
+    try {
+      const res = await api.updateUser(formData);
+      const success = res.status === 200
+      if (success) {
         navigate('/dashboard');
       }
-    }catch(e){
+    } catch (e) {
       console.log(e);
     }
   }
   const handleChange = (e) => {
-    const value = e.target.type==='checkbox'?e.target.checked:e.target.value;
+    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
     const name = e.target.name;
     setFormData((prev) => {
       return { ...prev, [name]: value }

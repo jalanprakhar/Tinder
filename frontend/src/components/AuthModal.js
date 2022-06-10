@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
-import {useCookies} from 'react-cookie';
-import axios from 'axios';
-import {useNavigate} from 'react-router-dom';
-function AuthModal({ setShowModal,isSignUp }) {
+import { useCookies } from 'react-cookie';
+import { useNavigate } from 'react-router-dom';
+import { api } from '../api';
+function AuthModal({ setShowModal, isSignUp }) {
   // eslint-disable-next-line
-  const [cookies,setCookie,removeCookie]=useCookies(['user']);
-  const navigate=useNavigate();
+  const [cookies, setCookie, removeCookie] = useCookies(['user']);
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -13,22 +13,21 @@ function AuthModal({ setShowModal,isSignUp }) {
   const handleClick = () => {
     setShowModal(false);
   }
-  // console.log(isSignUp);
-  const handleSubmit =async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       if (isSignUp && password !== confirmPassword) {
         setError("Passwords did not match")
         return;
       }
-      const res=await axios.post(`http://localhost:8000/${isSignUp?'signup':'login'}`,{email,password});
-      setCookie('AuthToken',res.data.token);
-      setCookie('UserId',res.data.userId);
-      const success=res.status===201;
-      if(success && isSignUp) navigate('/onboarding');
-      else if(success) navigate('/dashboard');
+      const res = await api.login_or_signup(isSignUp,email,password);
+      setCookie('AuthToken', res.data.token);
+      setCookie('UserId', res.data.userId);
+      const success = res.status === 201;
+      if (success && isSignUp) navigate('/onboarding');
+      else if (success) navigate('/dashboard');
       window.location.reload();
-      
+
     } catch (e) {
       console.log(e);
     }
@@ -36,7 +35,7 @@ function AuthModal({ setShowModal,isSignUp }) {
   }
   return (
     <div className='auth-modal'>
-      <div className='close-icon' onClick={handleClick} style={{cursor:'pointer'}}>
+      <div className='close-icon' onClick={handleClick} style={{ cursor: 'pointer' }}>
         ⓧ
       </div>
       <h2>{isSignUp ? 'Create Account' : 'Log In'}</h2>

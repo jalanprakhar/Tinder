@@ -1,5 +1,5 @@
-const mongoose=require('mongoose');
+const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost:27017/tinder').then(()=>{
+mongoose.connect('mongodb://localhost:27017/tinder').then(() => {
     console.log(`Connection Successfull`)
-}).catch((e)=>console.log(e));
+}).catch((e) => console.log(e));

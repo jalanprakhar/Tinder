@@ -1,7 +1,7 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 const Fourofour = () => {
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   return (
     <section class="page_404">
       <div class="container">
@@ -21,7 +21,7 @@ const Fourofour = () => {
 
                 <p>the page you are looking for not avaible!</p>
 
-                <button class="link_404" onClick={()=>navigate('/')}>Go to Home</button>
+                <button class="link_404" onClick={() => navigate('/')}>Go to Home</button>
               </div>
             </div>
           </div>
